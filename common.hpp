@@ -12,8 +12,8 @@ int recv_all(int sockfd, void *buff, size_t len);
 
 /* structure for TCP message */
 struct chat_packet {
-  uint16_t len;
-  char message[MSG_MAXSIZE + 1];
+	uint16_t len;
+	char message[MSG_MAXSIZE + 1];
 };
 
 /* Maximum size of the UDP topic */
@@ -24,9 +24,9 @@ struct chat_packet {
 
 /* structure for UDP message */
 struct udp_packet {
-  char topic[MAX_TOPIC_SIZE];
-  uint8_t data_type;
-  char message[MSG_UDP_MAXSIZE];
+	char topic[MAX_TOPIC_SIZE];
+	uint8_t data_type;
+	char message[MSG_UDP_MAXSIZE];
 };
 
 #endif

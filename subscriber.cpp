@@ -24,9 +24,9 @@ void setupSocket(int &sockfd, uint16_t port)
 	DIE(sockfd < 0, "socket");
 
 	/* Disable Nagle */
-    int flag = 1;
-    int rc = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (const void*) &flag, sizeof(int));
-    DIE(rc < 0, "nagle");
+	int flag = 1;
+	int rc = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (const void*) &flag, sizeof(int));
+	DIE(rc < 0, "nagle");
 
 	struct sockaddr_in serv_addr;
 	socklen_t socket_len = sizeof(struct sockaddr_in);
@@ -60,8 +60,8 @@ void run_client(int sockfd)
 		/* Check events on STDIN file descriptor */
 		if (fds[0].revents & POLLIN) {
 			if (!fgets(buf, sizeof(buf), stdin) || isspace(buf[0])) {
-                break;
-            }
+				break;
+			}
 
 			/* Check if the client wants to disconnect */
 			if (strcmp(buf, "exit\n") == 0) {
@@ -115,51 +115,51 @@ void run_client(int sockfd)
 
 			/* parse the udp_message */
 			if (udp_message.data_type == 0) {
-                /* get the sign byte */
-                uint8_t sign_byte = (uint8_t)udp_message.message[0];
+				/* get the sign byte */
+				uint8_t sign_byte = (uint8_t)udp_message.message[0];
 
-                int32_t value;
-                memcpy(&value, udp_message.message + sizeof(uint8_t), sizeof(uint32_t));
-                value = ntohl(value);
+				int32_t value;
+				memcpy(&value, udp_message.message + sizeof(uint8_t), sizeof(uint32_t));
+				value = ntohl(value);
 
-                if (sign_byte == 1) {
-                    value = -value;
-                    cout << udp_message.topic << " - INT - " << value << '\n';
-                } else {
-                    cout << udp_message.topic << " - INT - " << value << '\n';
-                }
-            } else if (udp_message.data_type == 1) {
-                uint16_t value;
+				if (sign_byte == 1) {
+					value = -value;
+					cout << udp_message.topic << " - INT - " << value << '\n';
+				} else {
+					cout << udp_message.topic << " - INT - " << value << '\n';
+				}
+			} else if (udp_message.data_type == 1) {
+				uint16_t value;
 
-                memcpy(&value, udp_message.message, sizeof(uint16_t));
-                value = ntohs(value);
+				memcpy(&value, udp_message.message, sizeof(uint16_t));
+				value = ntohs(value);
 
-                cout << fixed << setprecision(2);
-                cout << udp_message.topic << " - SHORT_REAL - " << (float) value / 100 << '\n'; 
-            } else if (udp_message.data_type == 2) {
-                uint8_t sign_byte = (uint8_t)udp_message.message[0];
+				cout << fixed << setprecision(2);
+				cout << udp_message.topic << " - SHORT_REAL - " << (float) value / 100 << '\n'; 
+			} else if (udp_message.data_type == 2) {
+				uint8_t sign_byte = (uint8_t)udp_message.message[0];
 
-                int32_t val;
-                memcpy(&val, udp_message.message + sizeof(uint8_t), sizeof(int32_t));
+				int32_t val;
+				memcpy(&val, udp_message.message + sizeof(uint8_t), sizeof(int32_t));
 
-                uint8_t pow;
-                memcpy(&pow, udp_message.message + sizeof(uint8_t) + sizeof(int32_t), sizeof(uint8_t));
+				uint8_t pow;
+				memcpy(&pow, udp_message.message + sizeof(uint8_t) + sizeof(int32_t), sizeof(uint8_t));
 
-                float final_val = ntohl(val);
+				float final_val = ntohl(val);
 
-                for (int i = 0; i < pow; i++)
-                    final_val /= 10;
+				for (int i = 0; i < pow; i++)
+					final_val /= 10;
 
-                if (sign_byte == 1) {
-                    final_val = -final_val;
-                }
+				if (sign_byte == 1) {
+					final_val = -final_val;
+				}
 
-                cout << fixed << setprecision(pow);
-                cout << udp_message.topic << " - FLOAT - " << final_val << '\n';            
-            } else if (udp_message.data_type == 3) {
-                udp_message.topic[strlen(udp_message.topic)] = '\0';
-                cout << udp_message.topic << " - STRING - " << (char *)udp_message.message << '\n';
-            }
+				cout << fixed << setprecision(pow);
+				cout << udp_message.topic << " - FLOAT - " << final_val << '\n';            
+			} else if (udp_message.data_type == 3) {
+				udp_message.topic[strlen(udp_message.topic)] = '\0';
+				cout << udp_message.topic << " - STRING - " << (char *)udp_message.message << '\n';
+			}
 		}
 	}
 }

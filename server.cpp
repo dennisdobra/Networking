@@ -18,10 +18,10 @@ using namespace std;
 #include "helpers.hpp"
 
 struct Client {
-    int socket;
+	int socket;
 	bool connected;
-    std::string id;
-    std::vector<std::string> subscribed_topics;
+	std::string id;
+	std::vector<std::string> subscribed_topics;
 };
 
 void setupTCPSocket(int &tcp_socket, uint16_t port)
@@ -44,8 +44,8 @@ void setupTCPSocket(int &tcp_socket, uint16_t port)
 		  using it for communication.
 	*/
 	int flag = 1;
-    int rc = setsockopt(tcp_socket, IPPROTO_TCP, TCP_NODELAY, (const void*) &flag, sizeof(int));
-    DIE(rc < 0, "nagle");
+	int rc = setsockopt(tcp_socket, IPPROTO_TCP, TCP_NODELAY, (const void*) &flag, sizeof(int));
+	DIE(rc < 0, "nagle");
 
 	/* Initializing the sockaddr_in structure */
 	struct sockaddr_in serv_addr;
@@ -88,13 +88,13 @@ void setupUDPSocket(int &udp_socket, uint16_t port)
 
 void run_server(int tcp_socket, int udp_socket)
 {
-    std::vector<Client> clients;
-    std::vector<pollfd> poll_fds(3);
+	std::vector<Client> clients;
+	std::vector<pollfd> poll_fds(3);
 
-    struct chat_packet received_tcp_packet; // packet received from a TCP client
+	struct chat_packet received_tcp_packet; // packet received from a TCP client
 	struct udp_packet received_udp_packet;  // packet received from a UDP client
 
-    /* set the TCP socket for listening */
+	/* set the TCP socket for listening */
 	/*
 		The 5 in the listen(tcp_socket, 5); function call refers to the backlog,
 		which is the maximum number of pending connections that can be queued up
@@ -118,84 +118,84 @@ void run_server(int tcp_socket, int udp_socket)
 	poll_fds[2].fd = udp_socket;
 	poll_fds[2].events = POLLIN;
 
-    while (1) {
-        /* We wait to receive something on one of the sockets with no time limit (-1) */
-        rc = poll(poll_fds.data(), poll_fds.size(), -1);
-        DIE(rc < 0, "poll");
+	while (1) {
+		/* We wait to receive something on one of the sockets with no time limit (-1) */
+		rc = poll(poll_fds.data(), poll_fds.size(), -1);
+		DIE(rc < 0, "poll");
 
 		/* check what we have received */
-        for (long unsigned int i = 0; i < poll_fds.size(); i++) {
-            if (poll_fds[i].revents & POLLIN) {
+		for (long unsigned int i = 0; i < poll_fds.size(); i++) {
+			if (poll_fds[i].revents & POLLIN) {
 				/* we have something on this poll_fds[i].fd file descriptor */
-                if (poll_fds[i].fd == tcp_socket) {
-                    /* I have received a connection request */
+				if (poll_fds[i].fd == tcp_socket) {
+					/* I have received a connection request */
 
-                    struct sockaddr_in cli_addr;
-                    socklen_t cli_len = sizeof(cli_addr);
+					struct sockaddr_in cli_addr;
+					socklen_t cli_len = sizeof(cli_addr);
 					/* After receiving a connection request on the listening socket, accept() function 
 					   returns a new socket which will be used for communication. */
-                    const int newsockfd = accept(tcp_socket, (struct sockaddr *)&cli_addr, &cli_len);
-                    DIE(newsockfd < 0, "accept");
+					const int newsockfd = accept(tcp_socket, (struct sockaddr *)&cli_addr, &cli_len);
+					DIE(newsockfd < 0, "accept");
 
-                    /* Get the CLIENT_ID from the new connection */
-                    int rc = recv_all(newsockfd, &received_tcp_packet, sizeof(received_tcp_packet));
-                    DIE(rc <= 0, "recv_all");
+					/* Get the CLIENT_ID from the new connection */
+					int rc = recv_all(newsockfd, &received_tcp_packet, sizeof(received_tcp_packet));
+					DIE(rc <= 0, "recv_all");
 
-                    /* Check if a client with the same ID is already connected */
-                    bool already_connected = false;
-                    for (const auto& client : clients) {
-                        if (client.id == received_tcp_packet.message && client.connected == true) {
-                            cout << "Client " << client.id << " already connected.\n";
-                            already_connected = true;
-                            close(newsockfd);
-                            break;
-                        }
-                    }
+					/* Check if a client with the same ID is already connected */
+					bool already_connected = false;
+					for (const auto& client : clients) {
+						if (client.id == received_tcp_packet.message && client.connected == true) {
+							cout << "Client " << client.id << " already connected.\n";
+							already_connected = true;
+							close(newsockfd);
+							break;
+						}
+					}
 
-                    /* Check if the client was previosuly connected */
-                    for (auto& client : clients) {
-                        if (client.id == received_tcp_packet.message && client.connected == false) {
-                            client.socket = newsockfd;
-                            client.connected = true;
-                            already_connected = true;
+					/* Check if the client was previosuly connected */
+					for (auto& client : clients) {
+						if (client.id == received_tcp_packet.message && client.connected == false) {
+							client.socket = newsockfd;
+							client.connected = true;
+							already_connected = true;
 
-                            struct pollfd new_poll;
-                            new_poll.fd = newsockfd;
-                            new_poll.events = POLLIN;
-                            poll_fds.push_back(new_poll);
+							struct pollfd new_poll;
+							new_poll.fd = newsockfd;
+							new_poll.events = POLLIN;
+							poll_fds.push_back(new_poll);
 
 							cout << "New client " << received_tcp_packet.message << " connected from " <<
-								    inet_ntoa(cli_addr.sin_addr) << ":" << ntohs(cli_addr.sin_port) << ".\n";
-                        }
-                    }
+									inet_ntoa(cli_addr.sin_addr) << ":" << ntohs(cli_addr.sin_port) << ".\n";
+						}
+					}
 
-                    /* Connect a completely new client */
-                    if (already_connected == false) {
-                        Client new_client;
-                        new_client.socket = newsockfd;
-                        new_client.connected = true;
-                        new_client.id = received_tcp_packet.message;
-                        clients.push_back(new_client);
+					/* Connect a completely new client */
+					if (already_connected == false) {
+						Client new_client;
+						new_client.socket = newsockfd;
+						new_client.connected = true;
+						new_client.id = received_tcp_packet.message;
+						clients.push_back(new_client);
 
-                        struct pollfd new_poll;
-                        new_poll.fd = newsockfd;
-                        new_poll.events = POLLIN;
-                        poll_fds.push_back(new_poll);
+						struct pollfd new_poll;
+						new_poll.fd = newsockfd;
+						new_poll.events = POLLIN;
+						poll_fds.push_back(new_poll);
 
-                        cout << "New client " << received_tcp_packet.message << " connected from " <<
+						cout << "New client " << received_tcp_packet.message << " connected from " <<
 								inet_ntoa(cli_addr.sin_addr) << ":" << ntohs(cli_addr.sin_port) << ".\n";
-                    }
-                } else if (poll_fds[i].fd == udp_socket) {
-                    /* Send the message only to the subscribed clients */
+					}
+				} else if (poll_fds[i].fd == udp_socket) {
+					/* Send the message only to the subscribed clients */
 
-                    /* Get the message */
+					/* Get the message */
 					rc = recvfrom(udp_socket, &received_udp_packet, sizeof(received_udp_packet), 0, NULL, NULL);
 					// rc = the number of bytes actually read
-                    
+					
 					/* a client can only receive TCP messages */
-                    *((char *)&received_udp_packet + rc) = 0;
-                    struct chat_packet packet;
-                    memcpy(packet.message, &received_udp_packet, sizeof(received_udp_packet));
+					*((char *)&received_udp_packet + rc) = 0;
+					struct chat_packet packet;
+					memcpy(packet.message, &received_udp_packet, sizeof(received_udp_packet));
 
 					/* See what clients are subscribed to the topic */
 					for (long unsigned int j = 0; j < clients.size(); j++) {
@@ -207,8 +207,8 @@ void run_server(int tcp_socket, int udp_socket)
 							}
 						}
 					}
-                } else if (poll_fds[i].fd == STDIN_FILENO) {
-                    /* we can only have the 'exit' command from STDIN on the server */
+				} else if (poll_fds[i].fd == STDIN_FILENO) {
+					/* we can only have the 'exit' command from STDIN on the server */
 					char command[256];
 					if (fgets(command, sizeof(command), stdin) != NULL) {
 						command[strcspn(command, "\n")] = '\0'; // remove '\n'
@@ -221,8 +221,8 @@ void run_server(int tcp_socket, int udp_socket)
 							exit(EXIT_SUCCESS);
 						}
 					}
-                } else {
-                    /* received data from one of the client sockets */
+				} else {
+					/* received data from one of the client sockets */
 					rc = recv_all(poll_fds[i].fd, &received_tcp_packet, sizeof(received_tcp_packet));
 					DIE(rc < 0, "recv_all");
 
@@ -242,7 +242,7 @@ void run_server(int tcp_socket, int udp_socket)
 						poll_fds.erase(poll_fds.begin() + i); // remove the i'th element
 						i--;
 					} else {
-                        /* client wants to subscribe/unsubscribe */
+						/* client wants to subscribe/unsubscribe */
 
 						char topic[55];
 
@@ -257,7 +257,7 @@ void run_server(int tcp_socket, int udp_socket)
 							want_to_unsubscribe = true;
 						}
 
-                        for (long unsigned int iter = 0; iter < clients.size(); iter++) {
+						for (long unsigned int iter = 0; iter < clients.size(); iter++) {
 							/* find the client that wants to subscribe/unsubscribe */
 							if (clients[iter].socket == poll_fds[i].fd) {
 								if (want_to_subscribe) {
@@ -284,11 +284,11 @@ void run_server(int tcp_socket, int udp_socket)
 								}
 							}
 						}
-                    }
-                }
-            }
-        }
-    }
+					}
+				}
+			}
+		}
+	}
 }
 
 int main(int argc, char *argv[]) {
