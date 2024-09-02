@@ -35,7 +35,6 @@ void setupSocket(int &sockfd, uint16_t port)
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(port);
 
-	// connect with the server
 	rc = connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 	DIE(rc < 0, "connect");
 }
@@ -83,7 +82,7 @@ void run_client(int sockfd)
 				/* send the TCP packet */
 				send_all(sockfd, &packet, sizeof(packet));
 
-				printf("Subscribed to topic %s\n", topic);
+				cout << "Subscribed to topic " << topic << '\n';
 			}
 
 			/* Check if the client wants to unsubscribe from a certain topic */
@@ -99,7 +98,7 @@ void run_client(int sockfd)
 				/* send the TCP packet */
 				send_all(sockfd, &packet, sizeof(packet));
 
-				printf("Unsubscribed from topic %s\n", topic);
+				cout << "Unsubscribed from topic " << topic << '\n';
 			}
 		}
 
@@ -115,55 +114,8 @@ void run_client(int sockfd)
 			struct udp_packet udp_message = *(struct udp_packet*)recv_packet.message;
 
 			/* parse the udp_message */
-			// if (udp_message.data_type == 0) {
-			// 	/* get the sign byte */
-			// 	uint8_t sign_byte  = (uint8_t)udp_message.message[0];
-
-			// 	uint32_t value;
-			// 	memcpy(&value, udp_message.message + sizeof(uint8_t), sizeof(uint32_t));
-			// 	value = ntohl(value);
-
-			// 	if (sign_byte == 1) {
-			// 		value = -value;
-			// 		cout << udp_message.topic << " - INT - " << value << '\n';
-			// 	} else {
-			// 		cout << udp_message.topic << " - INT - " << value << '\n';
-			// 	}
-			// } else if (udp_message.data_type == 1) {
-			// 	uint16_t value;
-
-			// 	memcpy(&value, udp_message.message, sizeof(uint16_t));
-			// 	value = ntohs(value);
-
-			// 	cout << fixed << setprecision(2);
-			// 	cout << udp_message.topic << " - SHORT_REAL - " << (float) value / 100 << '\n';
-			// } else if (udp_message.data_type == 2) {
-			// 	uint8_t sign_byte  = (uint8_t)udp_message.message[0];
-
-			// 	int32_t val;
-			// 	memcpy(&val, udp_message.message + sizeof(uint8_t), sizeof(int32_t));
-
-			// 	uint8_t pow;
-			// 	memcpy(&pow, udp_message.message + sizeof(uint8_t) + sizeof(int32_t), sizeof(uint8_t));
-				
-			// 	float final_value = ntohl(val);
-
-			// 	for (int i = 0; i < pow; i++) {
-			// 		final_value /= 10;
-			// 	}
-
-			// 	if (sign_byte == 1) {
-			// 		final_value = -final_value;
-			// 	}
-
-			// 	cout << fixed << setprecision(pow);
-			// 	cout << udp_message.topic << " - FLOAT - " << final_value << '\n';
-			// } else if (udp_message.data_type == 3) {
-			// 	udp_message.topic[strlen(udp_message.topic)] = '\0';
-			// 	cout << udp_message.topic << " - STRING - " << (char *)udp_message.message << '\n';
-			// }
 			if (udp_message.data_type == 0) {
-                // iau bitul de semn
+                /* get the sign byte */
                 uint8_t sign_byte = (uint8_t)udp_message.message[0];
 
                 int32_t value;
