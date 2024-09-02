@@ -7,14 +7,7 @@
 int send_all(int sockfd, void *buff, size_t len);
 int recv_all(int sockfd, void *buff, size_t len);
 
-// struct Client {
-//   int socket;
-//   int connected;
-//   std::string id;
-//   std::vector<std::string> subscribed_topics;
-// };
-
-/* Dimensiunea maxima a mesajului TCP */
+/* Maximum size of the TCP message */
 #define MSG_MAXSIZE 2000
 
 /* structure for TCP message */
@@ -23,10 +16,10 @@ struct chat_packet {
   char message[MSG_MAXSIZE + 1];
 };
 
-/* Dimensiunea maxima a topicului UDP */
+/* Maximum size of the UDP topic */
 #define MAX_TOPIC_SIZE 50
 
-/* Dimensiunea maxima a mesajului UDP */
+/* Maximum size of the UDP message */
 #define MSG_UDP_MAXSIZE 1501
 
 /* structure for UDP message */
