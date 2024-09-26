@@ -1,0 +1,6 @@
+[submodule "Router-Dataplane"]
+	path = Router-Dataplane
+	url = https://github.com/dennisdobra/Router-Dataplane.git
+[submodule "TCP-UDP-Messaging-Service"]
+	path = TCP-UDP-Messaging-Service
+	url = https://github.com/dennisdobra/TCP-UDP-Messaging-Service.git
