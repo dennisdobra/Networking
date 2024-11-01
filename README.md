@@ -22,4 +22,11 @@ The **TCP-UDP-Messaging-Service** project implements a messaging service using b
 
 ---
 
+## 3. Switch-Implementation
+
+- The **Switch-Implementation** project focuses on implementing a network switch using Mininet, a network simulation tool that operates with real kernel,
+  switch, and application code.
+- The primary objectives include developing a MAC address table for frame forwarding, implementing Virtual Local Area Networks (VLANs),
+  and utilizing the Spanning Tree Protocol (STP) to prevent network loops.
+
 This `README.md` serves as a general overview of the projects housed in this repository. For detailed explanations and instructions, please explore the individual project directories.
