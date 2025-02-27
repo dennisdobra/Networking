@@ -31,15 +31,14 @@ The **TCP-UDP-Messaging-Service** project implements a messaging service using b
 
 ## 4. HTTP Client for Online Library System
 
-The **HTTP Client for Online Library System** project implements a client for interacting with an online library system. Key functionality includes:
+The **HTTP Client for Online Library System** interacts with a digital library system. Key features include:
 
-- **User Registration**: Registers a new user via a `POST` request with a username and password.
-- **Login**: Authenticates users and stores a session cookie.
-- **Library Access**: Grants access to the digital library using a `GET` request and retrieves a JWT token.
-- **Book Management**: Allows users to view, add, and delete books via `GET`, `POST`, and `DELETE` requests.
-- **Logout**: Logs out the user by sending relevant requests to clear session cookies and JWT tokens.
+- **User Registration & Login**: Registers users and stores session cookies.
+- **Library Access**: Grants access with a JWT token.
+- **Book Management**: Allows viewing, adding, and deleting books.
+- **Logout**: Clears session and JWT tokens.
 
-Communication with the server is done via HTTP requests, and JSON responses are processed using the `nlohmann/json` library.
+Communication with the server is done via HTTP requests, with JSON responses parsed using the `nlohmann/json` library.
 
 ---
 
